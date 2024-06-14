@@ -3,6 +3,8 @@
 const ekleBtn = document.getElementById("ekle-btn")
 const gelirInput = document.getElementById("gelir-input")
 const ekleFormu = document.getElementById("ekle-formu")
+const temizleBtn = document.getElementById("temizle-btn")
+
 
 //^ Hesap Tablosu
 const gelirinizTd = document.getElementById("geliriniz")
@@ -138,5 +140,24 @@ if (e.target.classList.contains("fa-trash-can")) {
       const id = e.target.id // Satirin id sini aldik.
       harcamaListesi = harcamaListesi.filter((harcama)=> harcama.id != id) // Ilgili satiri harcama listesinden kaldirdik.
 
+      // Yeni olusan harcamListesini localStorage e güncellemek
+      localStorage.setItem("harcamalar", JSON.stringify(harcamaListesi))
+
+      // silinme isleminden sonra hesap kismini güncelle
+      hesapla()
 }
+})
+
+//! Bilgileri temizle butonu fonksiyonu
+
+temizleBtn.addEventListener("click", ()=>{
+  if (confirm("Tüm bilgileri silmek istediginize emin misiniz?")) {
+    harcamaListesi = [] // Harcama Listesini bosaltir.
+    gelirler = 0 // gelirler degiskenini sifirlar.
+    harcamaBody.innerHTML = "" // Domdaki veriyi siler. 
+    //localStorage.clear() //! localStorage teki her seyi siler.
+    localStorage.removeItem("gelirler") // localStrage den gelirleri siler.
+    localStorage.removeItem("harcamalar") // localStorage den harcamalari siler.
+    hesapla() // her sey silindikten sonra Dom'daki hesaplamayi yapmak icin
+  }
 })
