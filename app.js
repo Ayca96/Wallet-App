@@ -35,14 +35,18 @@ ekleFormu.addEventListener("submit", (e)=>{
     ekleFormu.reset()
     localStorage.setItem("gelirler", gelirler)
     gelirinizTd.textContent = new Intl.NumberFormat().format(gelirler)  
+    hesapla()
 
 })
 
 window.addEventListener("load",()=>{
-    gelirler = Number(localStorage.getItem("gelirler")) || 0
-    gelirinizTd.textContent = new Intl.NumberFormat().format(gelirler)  
+    gelirler = Number(localStorage.getItem("gelirler")) || 0   
     tarihInput.valueAsDate = new Date()
-    harcamaListesi = JSON.parse(localStorage.getItem("harcamalar"))
+    harcamaListesi = JSON.parse(localStorage.getItem("harcamalar"))  || []
+    harcamaListesi.forEach(harcama => {
+      harcamaYaz(harcama)
+    });
+    hesapla()
 })
 
 
@@ -62,6 +66,7 @@ harcamaFormu.addEventListener("submit", (e)=>{
     tarihInput.valueAsDate = new Date()
     localStorage.setItem("harcamalar", JSON.stringify(harcamaListesi))
     harcamaYaz(yeniHarcama)
+    hesapla()
 })
 
 
@@ -108,3 +113,30 @@ const harcamaYaz = ({id, tarih, miktar,alan})=>{
 
 
 }
+
+const hesapla = ()=>{
+  const giderler = harcamaListesi.reduce(
+    (toplam,harcama)=>toplam + Number(harcama.miktar),0
+    )
+
+    //console.log(giderler);
+
+    giderinizTd.textContent = new Intl.NumberFormat().format(giderler)
+    gelirinizTd.textContent = new Intl.NumberFormat().format(gelirler)
+    kalanTd.textContent = gelirler - giderler
+
+    const borclu = gelirler - giderler < 0
+    
+    kalanTd.classList.toggle("text-danger",borclu)
+    document.getElementById("kalanTh").classList.toggle("text-danger",borclu)
+}
+
+harcamaBody.addEventListener("click", (e)=>{
+
+if (e.target.classList.contains("fa-trash-can")) {
+      e.target.parentElement.parentElement.remove() // Dom dan ilgili satiri siler. 
+      const id = e.target.id // Satirin id sini aldik.
+      harcamaListesi = harcamaListesi.filter((harcama)=> harcama.id != id) // Ilgili satiri harcama listesinden kaldirdik.
+
+}
+})
